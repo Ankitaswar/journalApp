@@ -32,12 +32,25 @@ public class WeatherService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RedisService redisService;
+
     public WheatherResponse getWheather(String city){
-//        String finalAPI = API.replace("API_KEY",apiKey).replace("CITY", city);
-        String finalAPI =appCache.appCache.get(AppCache.keys.WEATHER_API.toString()).replace(AppConstant.API_KEY,apiKey).replace(AppConstant.CITY, city);
-        ResponseEntity<WheatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WheatherResponse.class);
+
+        WheatherResponse wheatherResponseCached = redisService.get("weather_of_" + city, WheatherResponse.class);
+        if(wheatherResponseCached != null){
+            return wheatherResponseCached;
+        }else{
+//            String finalAPI = API.replace("API_KEY",apiKey).replace("CITY", city);
+            String finalAPI =appCache.appCache.get(AppCache.keys.WEATHER_API.toString()).replace(AppConstant.API_KEY,apiKey).replace(AppConstant.CITY, city);
+            ResponseEntity<WheatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.GET, null, WheatherResponse.class);
 //        response.getStatusCode();
-        return response.getBody();
+            WheatherResponse body = response.getBody();
+            if(body != null){
+                redisService.set("weather_of_" + city, body, 300L);
+            }
+            return body;
+        }
     }
 
     //POST : just an example
