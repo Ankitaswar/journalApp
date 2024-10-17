@@ -72,7 +72,7 @@ public class UserScheduler {
 
                 //using kakfa
                 SentimentData sentimentData = SentimentData.builder().email(user.getEmail()).sentiment("sentiment for last 7 days").build();
-                kafkaTemplate.send("weeket-sentiments", sentimentData.getEmail(), sentimentData);
+                kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
             }
         }
     }
