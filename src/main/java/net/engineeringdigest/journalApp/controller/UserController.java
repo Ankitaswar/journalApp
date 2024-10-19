@@ -1,5 +1,6 @@
 package net.engineeringdigest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,6 +21,7 @@ import java.util.List;
 @Data
 @RestController
 @RequestMapping("/user")
+@Tag(name ="User APIs", description = "Users related crud operations")
 public class UserController {
 
     @Autowired

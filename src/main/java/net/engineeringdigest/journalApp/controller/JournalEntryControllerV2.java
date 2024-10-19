@@ -1,5 +1,7 @@
 package net.engineeringdigest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.entity.JournalEntryV2;
 import net.engineeringdigest.journalApp.entity.User;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/journal")
+@Tag(name ="JournalEntriesV2 APIs", description = "Journal Entry related crud operations")
 public class JournalEntryControllerV2 {
 
     @Autowired
@@ -28,6 +31,7 @@ public class JournalEntryControllerV2 {
     private UserService userService;
 
     @GetMapping
+    @Operation(summary = "Get All journal Entries of User")
     public ResponseEntity<List<JournalEntryV2>> getAllJournalEntriesOfUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
@@ -51,8 +55,10 @@ public class JournalEntryControllerV2 {
         }
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<JournalEntryV2> getEntryById(@PathVariable ObjectId id){
+    @GetMapping("/id/{myId}")
+    @Operation(summary = "Get journal Entries By Id")
+    public ResponseEntity<JournalEntryV2> getEntryById(@PathVariable String myId){
+        ObjectId id = new ObjectId(myId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
 
@@ -65,9 +71,9 @@ public class JournalEntryControllerV2 {
        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<?> deleteEntryById(@PathVariable ObjectId id){
-
+    @DeleteMapping("/id/{myId}")
+    public ResponseEntity<?> deleteEntryById(@PathVariable String myId){
+        ObjectId id = new ObjectId(myId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         boolean removed = journalEntryService.deleteById(id, userName);
@@ -78,10 +84,11 @@ public class JournalEntryControllerV2 {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<JournalEntryV2> updateEntryById(@PathVariable ObjectId id, @RequestBody JournalEntryV2 newEntry){
+    @PutMapping("/{myId}")
+    public ResponseEntity<JournalEntryV2> updateEntryById(@PathVariable String myId, @RequestBody JournalEntryV2 newEntry){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
+        ObjectId id = new ObjectId(myId);
 
         User user = userService.findByUserName(userName);
         List<JournalEntryV2> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(id)).collect(Collectors.toList());
